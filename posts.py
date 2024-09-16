@@ -42,6 +42,7 @@ def get_data_from_post(post_id):
         title=submission.title
         description=submission.selftext
         tag=submission.link_flair_text
+        print(f'Post ID: {post_id}')
         print(f"Title: {title}")
         print(f"Description: {description}")
         print(f"Tag: {tag}")
@@ -62,8 +63,15 @@ def get_data_from_post(post_id):
 #get post id from 
 base_url='https://www.reddit.com/r/realestateinvesting/'
 
+#to use browser in background without displayingo on screen
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
 # Initialize the WebDriver 
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=chrome_options)
 
 # Open page
 driver.get(base_url)
@@ -98,7 +106,7 @@ scraped_posts = set()
 while pages<7:   
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
-        if pages%2=0:
+        if pages%2==0:
                 start_time2 = datetime.now()
                 response=driver.page_source
                 soup=BeautifulSoup(response,'html5lib')
@@ -109,13 +117,14 @@ while pages<7:
                         if new_post not in scraped_posts:
                                 scraped_posts.add(new_post)
                                 new+=1
-                                # get_data_from_post(new_post)
-        print(f"Total posts on page: {len(new_posts)} ")
-        print(f'\nTotal New Post :{new} on  scrolling {pages} times')
+                                get_data_from_post(new_post)
+        # print(f"Total posts on page: {len(new_posts)} ")
+        # print(f'\nTotal New Post :{new} on  scrolling {pages} times')
+
         end_time2 = datetime.now()
         elapsed_time = (end_time2 - start_time2).total_seconds() / 60
         print(f"\nscraped total {new} new post in {elapsed_time:.2f} minutes\n")
-        print('-'*50)
+        print('#'*50)
         pages+=1
         
         
