@@ -54,14 +54,6 @@ for top_level_comment in submission.comments:
     print('-' * 50)
 
 
-# count=0
-# subreddit = reddit.subreddit('realestateinvesting')
-# for submission in subreddit.hot(limit=900):
-#     print(submission.title)
-#     print(f"post counter={count}")
-#     count+=1
-
-
 # Record the end time
 end_time = datetime.now()
 print(f"End Time: {end_time}")
