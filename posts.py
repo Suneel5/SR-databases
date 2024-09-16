@@ -22,13 +22,20 @@ load_dotenv()
 
 import praw
 
+# Access the environment variables
+client_id = os.getenv('client_id')
+client_secret = os.getenv('client_secret')
+password = os.getenv('password')
+user_agent = os.getenv('user_agent')
+user_name = os.getenv('user_name')
+
 # Authenticate using your Reddit API credentials
 reddit = praw.Reddit(
-    client_id='DL1gYnvsO1gYdQz4ptee2g',          
-    client_secret='jK7BZRCQubEICyORXgu1N_BVnGF85w',  
-    password='@Reddit2060',
-    user_agent='Scrape post by  u/Fluid_Mark5687',         
-    user_name='Fluid_Mark5687'
+    client_id=client_id,          
+    client_secret=client_secret,  
+#     password=password,
+    user_agent=user_agent         
+#     user_name=user_name
 )
 print()
 print(reddit.user.me())
@@ -39,12 +46,15 @@ def get_data_from_post(post_id):
         submission = reddit.submission(id=post_id)
         
         # Print post details
-        title=submission.title
-        description=submission.selftext
-        tag=submission.link_flair_text
+        
+        title=submission.title if submission.title else ' '
+        
+        description=submission.selftext if submission.selftext else ' '
+        tag=submission.link_flair_text if submission.link_flair_text else ' '
+
         print(f'Post ID: {post_id}')
         print(f"Title: {title}")
-        print(f"Description: {description}")
+        # print(f"Description: {description}")
         print(f"Tag: {tag}")
         # Enable comment forest expansion to ensure nested comments are loaded
         submission.comments.replace_more(limit=None)
@@ -52,10 +62,10 @@ def get_data_from_post(post_id):
         # Iterate through the comments
         for top_level_comment in submission.comments:
                 comment_replies.append(top_level_comment.body)
-                print(f"Comment: {top_level_comment.body}")
+                # print(f"Comment: {top_level_comment.body}")
                 for reply in top_level_comment.replies:
                         comment_replies.append(reply)
-                        print(f"Reply: {reply.body}")
+                        # print(f"Reply: {reply.body}")
 
         print('-' * 50)
 
@@ -63,12 +73,13 @@ def get_data_from_post(post_id):
 #get post id from 
 base_url='https://www.reddit.com/r/realestateinvesting/'
 
-#to use browser in background without displayingo on screen
+# to use browser in background without displayingo on screen
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run Chrome in headless mode
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")  # User-agent spoofing
 
 # Initialize the WebDriver 
 driver = webdriver.Chrome(options=chrome_options)
@@ -76,11 +87,13 @@ driver = webdriver.Chrome(options=chrome_options)
 # Open page
 driver.get(base_url)
 
-time.sleep(2)
+# time.sleep(2)
 #click on change post view
 try:    
         try:
-                change_view = driver.find_element(By.XPATH, "//shreddit-sort-dropdown[@header-text='View']")
+                change_view = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, "//shreddit-sort-dropdown[@header-text='View']"))
+                        )
                 driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", change_view)
                 ActionChains(driver).move_to_element(change_view).click().perform()
                 print('change view clicked')
@@ -96,14 +109,15 @@ try:
                 print('change view button not found')
                 pass  # No more "See more"
 except Exception as e:
-        print(f"Error while clicking 'change post view ': {e}")
+        print(f"Error while clicking 'change post view ': {e}") 
 
 
 # time.sleep(2)
 #scroll pages down 
 pages=0
 scraped_posts = set()
-while pages<7:   
+total_post=0
+while pages<402:   
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
         if pages%2==0:
@@ -124,6 +138,7 @@ while pages<7:
         end_time2 = datetime.now()
         elapsed_time = (end_time2 - start_time2).total_seconds() / 60
         print(f"\nscraped total {new} new post in {elapsed_time:.2f} minutes\n")
+        print(f'Total post till now: {len(scraped_posts)}')
         print('#'*50)
         pages+=1
         
