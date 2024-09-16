@@ -128,7 +128,6 @@ while pages<7:
         pages+=1
         
         
-
 print(f'\nTotal unique post:{len(scraped_posts)}')
 
 # Record the end time
