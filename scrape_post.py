@@ -23,43 +23,41 @@ base_url='https://www.reddit.com/r/realestateinvesting/'
 
 import praw
 
-# Authenticate using your Reddit API credentials
-reddit = praw.Reddit(
-    client_id='DL1gYnvsO1gYdQz4ptee2g',          
-    client_secret='jK7BZRCQubEICyORXgu1N_BVnGF85w',  
-    password='@Reddit2060',
-    user_agent='Scrape post by  u/Fluid_Mark5687',         
-    user_name='Fluid_Mark5687'
-)
-print()
-print(reddit.user.me())
-print()
+def get_data_from_post(post_id,connection=None):
+        # Define the post ID 
+        submission = reddit.submission(id=post_id)
+        
+        # Print post details
+        
+        title=submission.title if submission.title else ' '
+        
+        description=submission.selftext if submission.selftext else ' '
+        tag=submission.link_flair_text if submission.link_flair_text else ' '
 
-# Define the post ID 
-submission = reddit.submission(id="1fgmuyq")
+        print(f'Post ID: {post_id}')
+        print(f"Title: {title}")
+        print(f"Tag: {tag}")
+        print(f"Description: {description}")
+        
+        # Enable comment forest expansion to ensure nested comments are loaded
+        submission.comments.replace_more(limit=None)
+        comment_replies=[]
+        # Iterate through the comments
+        print('Comments: ')
+        for top_level_comment in submission.comments:
+                comment_replies.append(top_level_comment.body)
+                # Retrieve the comment author
+                comment_author = top_level_comment.author
+                comment_author_name = comment_author.name if comment_author else "Unknown"
+                print(f'{comment_author_name}: {top_level_comment.body}\n') 
+                print("Replies: ")
+                for reply in top_level_comment.replies:
+                        # Retrieve the reply author
+                        reply_author = reply.author
+                        reply_author_name = reply_author.name if reply_author else "Unknown"
+                        comment_replies.append(reply)
+                        print(f"{reply_author_name}:{reply.body}")
+        # comments_dump = '\n'.join(comment_replies)
+        # save_data_to_db(connection, post_id, title, description, tag, comments_dump)
 
-# Print post details
-print(f"Title: {submission.title}")
-print(f"Description: {submission.selftext}")
-print(f"Tag: {submission.link_flair_text}")
-# Enable comment forest expansion to ensure nested comments are loaded
-submission.comments.replace_more(limit=None)
-
-# Iterate through the comments
-print('\nCOmment and replies: ')
-for top_level_comment in submission.comments:
-    # print(f"Author: {top_level_comment.author}")
-    print(f" {top_level_comment.body}")
-    for reply in top_level_comment.replies:
-        print(f" {reply.body}")
-    print('-' * 50)
-
-
-# Record the end time
-end_time = datetime.now()
-print(f"End Time: {end_time}")
-
-# Calculate the elapsed time in minutes
-elapsed_time = (end_time - start_time).total_seconds() / 60
-print(f"Exceution Time: {elapsed_time:.2f} minutes")
-
+        print('-' * 50)

@@ -23,75 +23,10 @@ load_dotenv()
 import praw
 import mysql.connector
 from mysql.connector import Error
+# from manage_database import create_database_if_not_exists, connect_to_db, create_tables, save_data_to_db, save_comments_to_db,post_exists_in_db  # Import your database functions
+from manage_database import *
 
-def create_database_if_not_exists():
-    try:
-        # Connect without specifying the database
-        connection = mysql.connector.connect(
-            host='localhost',
-            user='root',  # Your MySQL username
-            password='12345678'  # Your MySQL password
-        )
-        if connection.is_connected():
-            cursor = connection.cursor()
-            # Create the database if it doesn't exist
-            cursor.execute("CREATE DATABASE IF NOT EXISTS post_db;")
-            print("Database 'post_db' created or already exists.")
-        cursor.close()
-        connection.close()
-        
-    except Error as e:
-        print(f"Error while creating the database: {e}")
-
-# Function to connect to MySQL and create table
-def connect_to_db():
-    try:
-        connection = mysql.connector.connect(
-            host='localhost',
-            database='post_db',
-            user='root',  # Your MySQL username
-            password='12345678'  # Your MySQL password
-        )
-        if connection.is_connected():
-            cursor = connection.cursor()
-            # Create a table if it doesn't already exist
-            create_table_query = """
-            CREATE TABLE IF NOT EXISTS posts (
-                id VARCHAR(50) PRIMARY KEY,
-                title TEXT,
-                description TEXT,
-                tag TEXT,
-                comments LONGTEXT
-            )
-            """
-            cursor.execute(create_table_query)
-            print("Successfully connected to the database and ensured table exists.")
-        return connection
-
-    except Error as e:
-        print(f"Error while connecting to MySQL: {e}")
-        return None
-    
-# Function to save data into MySQL
-def save_data_to_db(connection, post_id, title, description, tag, comments):
-    try:
-        cursor = connection.cursor()
-        insert_query = """
-        INSERT INTO reddit_posts (id, title, description, tag, comments)
-        VALUES (%s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-        title = VALUES(title),
-        description = VALUES(description),
-        tag = VALUES(tag),
-        comments = VALUES(comments)
-        """
-        cursor.execute(insert_query, (post_id, title, description, tag, comments))
-        connection.commit()
-        print(f"Post ID: {post_id} saved successfully.")
-    except Error as e:
-        print(f"Error while inserting data: {e}")
 # Access the environment variables
-
 client_id = os.getenv('client_id')
 client_secret = os.getenv('client_secret')
 user_agent = os.getenv('user_agent')
@@ -108,7 +43,7 @@ print()
 print(reddit.user.me())
 print()
 
-def get_data_from_post(post_id,connection=None):
+def get_data_save(post_id,connection):
         # Define the post ID 
         submission = reddit.submission(id=post_id)
         
@@ -120,25 +55,40 @@ def get_data_from_post(post_id,connection=None):
         tag=submission.link_flair_text if submission.link_flair_text else ' '
 
         print(f'Post ID: {post_id}')
-        print(f"Title: {title}")
+        # print(f"Title: {title}")
         print(f"Tag: {tag}")
-        print(f"Description: {description}")
-        
-        # Enable comment forest expansion to ensure nested comments are loaded
-        submission.comments.replace_more(limit=None)
-        comment_replies=[]
-        # Iterate through the comments
-        print('Comments: ')
-        for top_level_comment in submission.comments:
-                comment_replies.append(top_level_comment.body)
-                print(f'{top_level_comment}\n')
-                for reply in top_level_comment.replies:
-                        comment_replies.append(reply)
-                        print(f"{reply.body}")
-        # comments_dump = '\n'.join(comment_replies)
-        # save_data_to_db(connection, post_id, title, description, tag, comments_dump)
+        # print(f"Description: {description}")
+        # Check if the post already exists in the database
+        if not post_exists_in_db(connection, post_id):
+                # If the post does not exist, insert the post details
+                print('Writing data in db')
+                save_data_to_db(connection, post_id, title, tag, description)
 
-        print('-' * 50)
+                # Enable comment forest expansion to ensure nested comments are loaded
+                submission.comments.replace_more(limit=None)
+                # Iterate through the comments
+                # print('Comments: ')
+                comments=[]
+                for top_level_comment in submission.comments:
+                        # Retrieve the comment author
+                        comment_author = top_level_comment.author
+                        comment_author_name = comment_author.name if comment_author else "Unknown"
+                        # Add comment to the comments list
+                        
+                        save_comments_to_db(connection, post_id,comment_author_name, top_level_comment.body)
+                        # print(f'{comment_author_name}: {top_level_comment.body}\n') 
+
+                        # print("Replies: ")
+                        for reply in top_level_comment.replies:
+                                # Retrieve the reply author
+                                reply_author = reply.author
+                                reply_author_name = reply_author.name if reply_author else "Unknown"
+                                # Add reply to the comments list
+                                
+                                save_comments_to_db(connection, post_id,reply_author_name, reply.body)
+                                # print(f"{reply_author_name}:{reply.body}")
+                # After gathering all comments and replies, insert them into the database
+                print('-' * 50)
 
 
 #get post id from 
@@ -189,11 +139,12 @@ pages=0
 scraped_posts = set()
 total_post=0
 
-# Create the database if it doesn't exist
-# create_database_if_not_exists()
-# Connect to the database
-# connection = connect_to_db()
-while pages<1:   
+# Step 1: Database Initialization
+create_database_if_not_exists()  # Create database if not exists
+connection = connect_to_db()  # Connect to the database
+create_tables(connection)  # Create tables if not exist
+
+while pages<3:   
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
         if pages%2==0:
@@ -207,7 +158,7 @@ while pages<1:
                         if new_post not in scraped_posts:
                                 scraped_posts.add(new_post)
                                 new+=1
-                                get_data_from_post(new_post)
+                                get_data_save(new_post,connection)
         # print(f"Total posts on page: {len(new_posts)} ")
         # print(f'\nTotal New Post :{new} on  scrolling {pages} times')
 
@@ -221,10 +172,10 @@ while pages<1:
         
 print(f'\nTotal unique post:{len(scraped_posts)}')
 
-# Close the DB connection after scraping
-# if connection.is_connected():
-#     connection.close()
-    # print("MySQL connection is closed")
+# Close the DB connection
+if connection.is_connected():
+    connection.close()
+    print("MySQL connection is closed")
 
 
 # Record the end time
