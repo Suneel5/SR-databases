@@ -36,21 +36,22 @@ print(reddit.user.me())
 print()
 
 # Define the post ID 
-submission = reddit.submission(id="r2ro8w")
+submission = reddit.submission(id="1fgmuyq")
 
 # Print post details
 print(f"Title: {submission.title}")
 print(f"Description: {submission.selftext}")
-print(f"Post Flair: {submission.link_flair_text}")
+print(f"Tag: {submission.link_flair_text}")
 # Enable comment forest expansion to ensure nested comments are loaded
 submission.comments.replace_more(limit=None)
 
 # Iterate through the comments
+print('\nCOmment and replies: ')
 for top_level_comment in submission.comments:
     # print(f"Author: {top_level_comment.author}")
-    print(f"Comment: {top_level_comment.body}")
+    print(f" {top_level_comment.body}")
     for reply in top_level_comment.replies:
-        print(f"Reply: {reply.body}")
+        print(f" {reply.body}")
     print('-' * 50)
 
 
