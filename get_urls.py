@@ -8,13 +8,6 @@ from bs4 import BeautifulSoup
 import json
 import os
 import time
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome.options import Options
 from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
@@ -95,7 +88,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2024-04-13', '%Y-%m-%d')
+end_date = datetime.strptime('2023-04-07', '%Y-%m-%d')
 start_date = datetime.strptime('2021-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -115,14 +108,15 @@ while current_date >= start_date:
     df=get_page_save_links(url,next_formatted_date,df)
 
     # Add random delay between iterations (between 1 and 5 seconds)
-    delay = random.uniform(5, 11)
+    delay = random.uniform(9, 17)
+    print(f'counter:{i}\n')
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
     
     # Move to the previous day
     current_date = prev_day
-    print(f'counter:{i}\n')
-    if i>40:
+    
+    if i>80:
         break
     i+=1
 
