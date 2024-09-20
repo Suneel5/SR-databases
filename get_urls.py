@@ -14,6 +14,8 @@ import numpy as np
 import random
 import re
 from datetime import datetime, timedelta
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 load_dotenv()   
 
@@ -53,42 +55,82 @@ else:
     # Create an empty DataFrame if the file doesn't exist
     df = pd.DataFrame(columns=['url', 'postid','min_date'])
 
+def post_exists(post_id, df):
+    """Check if a post already exists in the DataFrame based on postid."""
+    return post_id in df['postid'].values
+
+def check_date_count(next_formatted_date, df):
+    
+    # Filter the DataFrame where the 'min_date' column matches the next_formatted_date
+    count = df[df['min_date'] == next_formatted_date].shape[0]
+
+    # Return True if the count is greater than 9, otherwise False
+    return count > 9
+
+
+# to use browser in background without displayingo on screen
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")  # User-agent spoofing
+
+# Initialize the WebDriver 
+# driver = webdriver.Chrome(options=chrome_options)
+# Initialize the WebDriver 
+driver = webdriver.Chrome()
+
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")
     proxy=None
     proxies = {"https": proxy, "http": proxy} if proxy and (proxy.startswith("https") or proxy.startswith("http")) else None
 
-    response=requests.get(url,
-                        headers={
-                "User-Agent": get_useragent()
-            },
-            proxies=None)
+    # response=requests.get(url,
+    #                     headers={
+    #             "User-Agent": get_useragent()
+    #         },
+    #         proxies=None)
+    
+    # Open page
+    time.sleep(4)
+    driver.get(url)
+    time.sleep(10)
+    response=driver.page_source
             
-    soup=BeautifulSoup(response.text,'html5lib')
+    soup=BeautifulSoup(response,'html5lib')
     result_block = soup.find_all("div", attrs={"class": "g"})
 
+    results_no=0
+    if not result_block:
+        print(f"No results found for the URL: {url}")
+        return df, 0
     for result in result_block:
         link = result.find("a", href=True)['href']
         postid=extract_postid(link)
-        print(f'Link: {link}')
-        # print(f'Postid: {postid}')
-        dictt={'url': link, 
-               'postid': postid,
-               'min_date':min_date}
-        new_row=pd.DataFrame([dictt])
-        df = pd.concat([df, new_row], ignore_index=True)
+        # Check if the post already exists in the CSV file
+        if not post_exists(postid, df):
+            print(f'Link: {link}')
+            # print(f'Postid: {postid}')
+            dictt={'url': link, 
+                'postid': postid,
+                'min_date':min_date}
+            new_row=pd.DataFrame([dictt])
+            df = pd.concat([df, new_row], ignore_index=True)
+        else:
+            print(f'Post: {postid} Already exists in csv file')
 
-    # Save the updated DataFrame to the CSV file
+    # Save the updated DataFrame to the CSV file for every requests
     df.to_csv(csv_file, index=False)
     print(f"\nData has been written to {csv_file} successfully.\n")
-    return df
+    return df, len(result_block)
 
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2023-04-07', '%Y-%m-%d')
+end_date = datetime.strptime('2022-07-18', '%Y-%m-%d')
 start_date = datetime.strptime('2021-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -105,10 +147,13 @@ while current_date >= start_date:
 
     url = f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/'
     
-    df=get_page_save_links(url,next_formatted_date,df)
-
+    df,no_of_output=get_page_save_links(url,next_formatted_date,df)
+    if no_of_output>9:
+        print('Opening Next page ')
+        url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=10'
+        df,no_of_output=get_page_save_links(url,next_formatted_date,df)
     # Add random delay between iterations (between 1 and 5 seconds)
-    delay = random.uniform(9, 17)
+    delay = random.uniform(3, 7)
     print(f'counter:{i}\n')
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
@@ -116,9 +161,12 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>80:
+    if i>30:
         break
     i+=1
+
+
+driver.close()
 
 
 
