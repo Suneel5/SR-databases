@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
@@ -19,7 +18,7 @@ while current_date >= start_date:
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
 
-    url = f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/'
+    url = f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/'
     print(url)
     print()
     current_date = prev_day

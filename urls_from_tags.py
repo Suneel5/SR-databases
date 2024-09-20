@@ -58,7 +58,7 @@ def post_exists(post_id):
 
 
 def url_from_tag(tag,df):
-    url=f'https://www.reddit.com/r/realestateinvesting/?f=flair_name%3A"{tag}"'
+    url=f'https://www.reddit.com/r/RealEstate/?f=flair_name%3A"{tag}"'
     # Open page
     driver.get(url)
 

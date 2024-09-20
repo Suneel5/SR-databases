@@ -42,7 +42,7 @@ def extract_postid(link):
     return None
     
 # Initialize or load the CSV file if it exists
-csv_file = 'links.csv'
+csv_file = 'posts_url/links.csv'
 
 if os.path.exists(csv_file):
     # Load the existing CSV file
@@ -62,7 +62,6 @@ def check_date_count(next_formatted_date, df):
 
     # Return True if the count is greater than 9, otherwise False
     return count > 9
-
 
 # to use browser in background without displayingo on screen
 chrome_options = Options()
@@ -130,7 +129,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2019-12-3', '%Y-%m-%d')
+end_date = datetime.strptime('2024-7-30', '%Y-%m-%d')
 start_date = datetime.strptime('2016-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -145,17 +144,18 @@ while current_date >= start_date:
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
 
-    url = f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/'
+    url = f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/'
     
     df,no_of_output=get_page_save_links(url,next_formatted_date,df)
+    
     if no_of_output>9:
         print('Opening Next page ')
-        url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=10'
+        url=f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/&start=10'
         df,no_of_output=get_page_save_links(url,next_formatted_date,df)
 
     if no_of_output>9:
         print('Opening Third page')
-        url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=20'
+        url=f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/&start=20'
         df,no_of_output=get_page_save_links(url,next_formatted_date,df)
 
 

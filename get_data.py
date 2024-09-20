@@ -81,14 +81,14 @@ def get_data_save(post_id,connection):
 
 
 #combine links csv
-df1=pd.read_csv('links.csv')
-df2=pd.read_csv('links_from_redditapi.csv')
+df1=pd.read_csv('posts_url/links.csv')
+df2=pd.read_csv('posts_url/links_from_redditapi.csv')
 
 final_df= pd.concat([df1, df2], ignore_index=True)
 
 #remove duplicates post id
 final_df = final_df.drop_duplicates(subset='postid')
-final_df.to_csv('final_links.csv', index=False)
+final_df.to_csv('posts_url/final_links.csv', index=False)
 print(f"\nData has been written to 'final_links.csv' successfully.\n")
 
 

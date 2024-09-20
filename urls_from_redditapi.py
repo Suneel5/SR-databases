@@ -25,7 +25,7 @@ reddit = praw.Reddit(
 print(f"Authenticated as: {reddit.user.me()}\n")
 
 # Initialize or load the CSV file if it exists
-csv_file = 'links_from_redditapi.csv'
+csv_file = 'posts_url/links_from_redditapi.csv'
 if os.path.exists(csv_file):
     # Load the existing CSV file
     df = pd.read_csv(csv_file)
@@ -34,7 +34,7 @@ else:
     df = pd.DataFrame(columns=['url', 'postid', 'min_date'])
 
 # Define the subreddit and categories
-subreddit = reddit.subreddit('realestateinvesting')
+subreddit = reddit.subreddit('RealEstate')
 categories = ['hot', 'top', 'new', 'rising']
 
 def get_posts_from_category(category):
