@@ -20,10 +20,6 @@ from selenium.webdriver.chrome.options import Options
 load_dotenv()   
 
 import praw
-import mysql.connector
-from mysql.connector import Error
-# from manage_database import create_database_if_not_exists, connect_to_db, create_tables, save_data_to_db, save_comments_to_db,post_exists_in_db  # Import your database functions
-from manage_database import *
 
 # df=pd.read('')
 def get_useragent():
@@ -81,25 +77,29 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
 # Initialize the WebDriver 
 driver = webdriver.Chrome()
 
+df2=pd.read_csv
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")
     proxy=None
     proxies = {"https": proxy, "http": proxy} if proxy and (proxy.startswith("https") or proxy.startswith("http")) else None
 
-    # response=requests.get(url,
-    #                     headers={
-    #             "User-Agent": get_useragent()
-    #         },
-    #         proxies=None)
+    response=requests.get(url,
+                        headers={
+                "User-Agent": get_useragent()
+            },
+            proxies=None)
     
     # Open page
-    time.sleep(4)
+    time.sleep(2)
     driver.get(url)
-    time.sleep(10)
+    time.sleep(5)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(4)
     response=driver.page_source
             
     soup=BeautifulSoup(response,'html5lib')
+    # soup=BeautifulSoup(response.text,'html5lib')
     result_block = soup.find_all("div", attrs={"class": "g"})
 
     results_no=0
@@ -130,8 +130,8 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2022-07-18', '%Y-%m-%d')
-start_date = datetime.strptime('2021-01-01', '%Y-%m-%d')
+end_date = datetime.strptime('2019-12-3', '%Y-%m-%d')
+start_date = datetime.strptime('2016-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
@@ -140,7 +140,7 @@ while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=1)
+    prev_day = current_date - timedelta(days=16)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
@@ -152,6 +152,13 @@ while current_date >= start_date:
         print('Opening Next page ')
         url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=10'
         df,no_of_output=get_page_save_links(url,next_formatted_date,df)
+
+    if no_of_output>9:
+        print('Opening Third page')
+        url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=20'
+        df,no_of_output=get_page_save_links(url,next_formatted_date,df)
+
+
     # Add random delay between iterations (between 1 and 5 seconds)
     delay = random.uniform(3, 7)
     print(f'counter:{i}\n')
@@ -161,12 +168,12 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>30:
+    if i>12:
         break
     i+=1
 
 
-driver.close()
+# driver.close()
 
 
 

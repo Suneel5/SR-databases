@@ -18,10 +18,20 @@ import mysql.connector
 from mysql.connector import Error
 # from manage_database import create_database_if_not_exists, connect_to_db, create_tables, save_data_to_db, save_comments_to_db,post_exists_in_db  # Import your database functions
 from manage_database import *
+# Access the environment variables
+client_id = os.getenv('client_id')
+client_secret = os.getenv('client_secret')
+user_agent = os.getenv('user_agent')
 
-
-
-
+# Authenticate using your Reddit API credentials
+reddit = praw.Reddit(
+    client_id=client_id,          
+    client_secret=client_secret,  
+#     password=password,
+    user_agent=user_agent         
+#     user_name=user_name
+)
+tags=[]
 def get_data_save(post_id,connection):
         # Define the post ID 
         submission = reddit.submission(id=post_id)
@@ -32,7 +42,7 @@ def get_data_save(post_id,connection):
         
         description=submission.selftext if submission.selftext else ' '
         tag=submission.link_flair_text if submission.link_flair_text else ' '
-
+        tags.append(tag)
         print(f'Post ID: {post_id}')
         # print(f"Title: {title}")
         print(f"Tag: {tag}")
@@ -70,13 +80,49 @@ def get_data_save(post_id,connection):
                 print('-' * 50)
 
 
-
 #combine links csv
 df1=pd.read_csv('links.csv')
 df2=pd.read_csv('links_from_redditapi.csv')
 
+final_df= pd.concat([df1, df2], ignore_index=True)
 
 #remove duplicates post id
+final_df = final_df.drop_duplicates(subset='postid')
+final_df.to_csv('final_links.csv', index=False)
+print(f"\nData has been written to 'final_links.csv' successfully.\n")
 
 
-#call get data for all func
+# Step 1: Database Initialization
+create_database_if_not_exists()  # Create database if not exists
+connection = connect_to_db()  # Connect to the database
+create_tables(connection)  # Create tables if not exist
+
+
+# call get data for all postid
+# for postid in final_df['postid'].values[:4000]:
+#     get_data_save(postid,connection)
+#     time.sleep(2)
+
+
+# Close the DB connection
+if connection.is_connected():
+    connection.close()
+    print("MySQL connection is closed")
+
+
+tags=set(tags)
+tags=list(tags)
+
+print(tags)
+# Convert the list to a DataFrame
+df = pd.DataFrame(tags, columns=['tag'])
+
+# Save the DataFrame to a CSV file (one element per row)
+df.to_csv('tags.csv', index=False)
+
+# Record the end time
+end_time = datetime.now()
+print(f"End Time: {end_time}")
+# Calculate the elapsed time in minutes
+elapsed_time = (end_time - start_time).total_seconds() / 60
+print(f"Exceution Time: {elapsed_time:.2f} minutes")
