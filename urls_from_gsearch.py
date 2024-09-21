@@ -92,9 +92,9 @@ def get_page_save_links(url,min_date,df):
     
     # Open page
     driver.get(url)
-    time.sleep(9)
+    time.sleep(13)
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(4)
+    time.sleep(3)
     response=driver.page_source
             
     soup=BeautifulSoup(response,'html5lib')
@@ -130,7 +130,7 @@ def format_date(date_obj):
 
 
 end_date = datetime.strptime('2024-7-27', '%Y-%m-%d')
-start_date = datetime.strptime('2024-06-29', '%Y-%m-%d')
+start_date = datetime.strptime('2018-01-1', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
@@ -160,16 +160,16 @@ while current_date >= start_date:
             print(f'Opening page {start_page // 10 + 2}')
             start_page += 10  # Increment for the next page
     # Add random delay between iterations (between 1 and 5 seconds)
-    delay = random.uniform(1, 6)
+    delay = random.uniform(1, 4)
     print(f'counter:{i}\n')
-    print(f"Sleeping for {delay:.2f} seconds")
+    print(f"Sleeping for {delay:.2f} seconds\n")
     time.sleep(delay)  # Random sleep    
     
     # Move to the previous day
     current_date = prev_day
     
-    if i>15:
+    if i>20:
         break
     i+=1
 
-# driver.close()
+driver.close()
