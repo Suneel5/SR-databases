@@ -77,7 +77,7 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
 # Initialize the WebDriver 
 driver = webdriver.Chrome()
 
-df2=pd.read_csv
+df2=pd.read_csv('links_from_redditapi.csv')
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")
@@ -110,7 +110,7 @@ def get_page_save_links(url,min_date,df):
         link = result.find("a", href=True)['href']
         postid=extract_postid(link)
         # Check if the post already exists in the CSV file
-        if not post_exists(postid, df):
+        if not post_exists(postid, df) and not post_exists(postid,df2):
             print(f'Link: {link}')
             # print(f'Postid: {postid}')
             dictt={'url': link, 
@@ -130,8 +130,8 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2019-12-3', '%Y-%m-%d')
-start_date = datetime.strptime('2016-01-01', '%Y-%m-%d')
+end_date = datetime.strptime('2024-4-20', '%Y-%m-%d')
+start_date = datetime.strptime('2024-01-16', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
@@ -140,24 +140,23 @@ while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=16)
+    prev_day = current_date - timedelta(days=1)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
 
     url = f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/'
-    
-    df,no_of_output=get_page_save_links(url,next_formatted_date,df)
-    if no_of_output>9:
-        print('Opening Next page ')
-        url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=10'
+    if check_date_count(next_formatted_date,df):
         df,no_of_output=get_page_save_links(url,next_formatted_date,df)
+        if no_of_output>9:
+            print('Opening Next page ')
+            url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=10'
+            df,no_of_output=get_page_save_links(url,next_formatted_date,df)
 
-    if no_of_output>9:
-        print('Opening Third page')
-        url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=20'
-        df,no_of_output=get_page_save_links(url,next_formatted_date,df)
-
+        if no_of_output>9:
+            print('Opening Third page')
+            url=f'https://www.google.com/search?q=realestateinvesting+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/realestateinvesting/&start=20'
+            df,no_of_output=get_page_save_links(url,next_formatted_date,df)
 
     # Add random delay between iterations (between 1 and 5 seconds)
     delay = random.uniform(3, 7)
@@ -168,7 +167,7 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>12:
+    if i>30:
         break
     i+=1
 

@@ -135,7 +135,7 @@ tags=['Rehabbing/Flipping', 'Commercial Real Estate', 'Legal', 'Self-Directed/Re
 # tags_df=pd.read_csv('tags.csv')
 # tags=tags_df['tag'].values
 print(tags)
-for tag in tags[2:]:
+for tag in tags[14:]:
     if not tag==' ':
         print(f'\nTag: {tag}\n')
         df=url_from_tag(tag,df)
