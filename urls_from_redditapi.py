@@ -62,16 +62,18 @@ for category in categories:
         # Convert Unix timestamp to human-readable format
         date_posted = datetime.fromtimestamp(post.created_utc)
         post_id = post.id
+        # Get only the date part
+        date_only = date_posted.date()
         
         # Check if the post already exists in the CSV file
         if not post_exists(post_id, df):
-            print(f"New Post - URL: {post.url}, Post ID: {post_id}, Date Posted: {date_posted}")
+            print(f"New Post - URL: {post.url}")
             
             # Create a dictionary for the new post
             new_post = {
                 'url': post.url,
                 'postid': post_id,
-                'min_date': date_posted
+                'min_date': date_only
             }
             
             # Add new post to the DataFrame

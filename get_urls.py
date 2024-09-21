@@ -76,7 +76,7 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
 # Initialize the WebDriver 
 driver = webdriver.Chrome()
 
-df2=pd.read_csv
+df2=pd.read_csv('post_url/links_from_redditapi.csv')
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")
@@ -109,7 +109,7 @@ def get_page_save_links(url,min_date,df):
         link = result.find("a", href=True)['href']
         postid=extract_postid(link)
         # Check if the post already exists in the CSV file
-        if not post_exists(postid, df):
+        if not post_exists(postid, df) and not post_exists(postid,df2):
             print(f'Link: {link}')
             # print(f'Postid: {postid}')
             dictt={'url': link, 

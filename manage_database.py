@@ -39,17 +39,18 @@ def create_tables(connection):
     try:
         cursor = connection.cursor()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS title (
+            CREATE TABLE IF NOT EXISTS RE_titles (
                 postno INT AUTO_INCREMENT  UNIQUE,
                 titleid VARCHAR(255) PRIMARY KEY,
                 title TEXT,
                 tag VARCHAR(255),
-                description TEXT
+                description TEXT,
+                source VARCHAR(255)
             )
         ''')
         
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS comments (
+            CREATE TABLE IF NOT EXISTS RE_comments (
                 commentid INT AUTO_INCREMENT PRIMARY KEY,
                 titleid VARCHAR(255),
                 userid VARCHAR(255),
@@ -57,7 +58,7 @@ def create_tables(connection):
                 FOREIGN KEY (titleid) REFERENCES title(titleid)
             )
         ''')
-        print("Tables 'title' and 'comments' created or already exist.")
+        print("Tables 'RE_title' and 'RE_comments' created or already exist.")
     except Error as e:
         print(f"Error while creating tables: {e}")
     finally:
