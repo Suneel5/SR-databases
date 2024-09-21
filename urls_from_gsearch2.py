@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 import json
 import os
 import time
-from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 import random
@@ -16,10 +15,6 @@ import re
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
-load_dotenv()   
-
-import praw
 
 # df=pd.read('')
 def get_useragent():
@@ -55,14 +50,6 @@ def post_exists(post_id, df):
     """Check if a post already exists in the DataFrame based on postid."""
     return post_id in df['postid'].values
 
-def check_date_count(next_formatted_date, df):
-    
-    # Filter the DataFrame where the 'min_date' column matches the next_formatted_date
-    count = df[df['min_date'] == next_formatted_date].shape[0]
-
-    # Return True if the count is greater than 9, otherwise False
-    return count > 9
-
 # to use browser in background without displayingo on screen
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run Chrome in headless mode
@@ -76,25 +63,24 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
 # Initialize the WebDriver 
 driver = webdriver.Chrome()
 
-df2=pd.read_csv('post_url/links_from_redditapi.csv')
+df2=pd.read_csv('posts_url/links_from_redditapi.csv')
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")
     proxy=None
     proxies = {"https": proxy, "http": proxy} if proxy and (proxy.startswith("https") or proxy.startswith("http")) else None
 
-    response=requests.get(url,
-                        headers={
-                "User-Agent": get_useragent()
-            },
-            proxies=None)
+    # response=requests.get(url,
+    #                     headers={
+    #             "User-Agent": get_useragent()
+    #         },
+    #         proxies=None)
     
     # Open page
-    time.sleep(2)
     driver.get(url)
-    time.sleep(5)
+    time.sleep(16)
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(4)
+    time.sleep(2)
     response=driver.page_source
             
     soup=BeautifulSoup(response,'html5lib')
@@ -128,18 +114,18 @@ def get_page_save_links(url,min_date,df):
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
-
-end_date = datetime.strptime('2024-09-08', '%Y-%m-%d')
-start_date = datetime.strptime('2016-01-01', '%Y-%m-%d')
+end_date = datetime.strptime('2024-07-28', '%Y-%m-%d')
+start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
 start_page=0
+i=0
 while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=16)
+    prev_day = current_date - timedelta(days=2)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
@@ -161,7 +147,7 @@ while current_date >= start_date:
             start_page += 10  # Increment for the next page
 
     # Add random delay between iterations 
-    delay = random.uniform(3, 7)
+    delay = random.uniform(1, 6)
     print(f'counter:{i}\n')
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
@@ -169,11 +155,11 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>12:
+    if i>4:
         break
     i+=1
 
-# driver.close()
+driver.close()
 
 
 

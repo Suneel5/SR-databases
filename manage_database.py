@@ -72,7 +72,7 @@ def save_data_to_db(connection,titleid, title, tag, description):
             INSERT INTO RE_title (titleid,title, tag, description,source) 
             VALUES (%s, %s, %s, %s,%s)
         '''
-        cursor.execute(insert_title_query, (titleid,title, tag, description))
+        cursor.execute(insert_title_query, (titleid,title, tag, description,'r/RealEstate'))
         connection.commit()
         print(f"Title '{title}' inserted with titleid: {titleid}")
         return titleid
