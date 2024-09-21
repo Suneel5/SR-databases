@@ -110,15 +110,15 @@ if connection.is_connected():
     print("MySQL connection is closed")
 
 
-tags=set(tags)
-tags=list(tags)
+# tags=set(tags)
+# tags=list(tags)
 
-print(tags)
-# Convert the list to a DataFrame
-df = pd.DataFrame(tags, columns=['tag'])
+# print(tags)
+# # Convert the list to a DataFrame
+# df = pd.DataFrame(tags, columns=['tag'])
 
 # Save the DataFrame to a CSV file (one element per row)
-df.to_csv('tags.csv', index=False)
+# df.to_csv('tags.csv', index=False)
 
 # Record the end time
 end_time = datetime.now()
