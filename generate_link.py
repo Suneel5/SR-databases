@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
-end_date = datetime.strptime('2019-12-30', '%Y-%m-%d')
-start_date = datetime.strptime('2018-01-01', '%Y-%m-%d')
+end_date = datetime.strptime('2024-09-08', '%Y-%m-%d')
+start_date = datetime.strptime('2024-09-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
@@ -13,7 +13,7 @@ while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=15)
+    prev_day = current_date - timedelta(days=2)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search

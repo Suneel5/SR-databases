@@ -129,12 +129,12 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2024-7-30', '%Y-%m-%d')
+end_date = datetime.strptime('2024-09-08', '%Y-%m-%d')
 start_date = datetime.strptime('2016-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
-i=0
+start_page=0
 while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
@@ -143,23 +143,24 @@ while current_date >= start_date:
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
-
-    url = f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/'
+    # Initialize variables for pagination
+    start_page = 0
+    no_of_output = 10  # Initial condition to enter the pagination loop
     
-    df,no_of_output=get_page_save_links(url,next_formatted_date,df)
-    
-    if no_of_output>9:
-        print('Opening Next page ')
-        url=f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/&start=10'
-        df,no_of_output=get_page_save_links(url,next_formatted_date,df)
+    # Pagination loop, continues until no_of_output < 10
+    while no_of_output >= 10:
+        # Construct the URL with pagination
+        url = f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/&start={start_page}'
+        
+        # Call your function to scrape the page and save the links
+        df, no_of_output = get_page_save_links(url, next_formatted_date, df)
+        
+        # If there are more than 9 results, move to the next page
+        if no_of_output >= 10:
+            print(f'Opening page {start_page // 10 + 2}')
+            start_page += 10  # Increment for the next page
 
-    if no_of_output>9:
-        print('Opening Third page')
-        url=f'https://www.google.com/search?q=RealEstate+reddit&tbs=cdr:1,cd_min:{next_formatted_date},cd_max:{formatted_date}&as_sitesearch=reddit.com/r/RealEstate/&start=20'
-        df,no_of_output=get_page_save_links(url,next_formatted_date,df)
-
-
-    # Add random delay between iterations (between 1 and 5 seconds)
+    # Add random delay between iterations 
     delay = random.uniform(3, 7)
     print(f'counter:{i}\n')
     print(f"Sleeping for {delay:.2f} seconds")
@@ -171,7 +172,6 @@ while current_date >= start_date:
     if i>12:
         break
     i+=1
-
 
 # driver.close()
 
