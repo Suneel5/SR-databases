@@ -69,8 +69,8 @@ def save_data_to_db(connection,titleid, title, tag, description):
     try:
         cursor = connection.cursor()
         insert_title_query = '''
-            INSERT INTO title (titleid,title, tag, description) 
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO RE_title (titleid,title, tag, description,source) 
+            VALUES (%s, %s, %s, %s,%s)
         '''
         cursor.execute(insert_title_query, (titleid,title, tag, description))
         connection.commit()
@@ -87,7 +87,7 @@ def save_comments_to_db(connection, titleid,userid, comment):
     try:
         cursor = connection.cursor()
         insert_comment_query = '''
-            INSERT INTO comments (titleid,userid, comment) 
+            INSERT INTO RE_comments (titleid,userid, comment) 
             VALUES (%s, %s, %s)
         '''
         cursor.execute(insert_comment_query, (titleid,userid, comment))
@@ -102,7 +102,7 @@ def post_exists_in_db(connection, titleid):
     try:
         cursor = connection.cursor()
         check_query = '''
-            SELECT COUNT(*) FROM title WHERE titleid = %s
+            SELECT COUNT(*) FROM RE_title WHERE titleid = %s
         '''
         cursor.execute(check_query, (titleid,))
         result = cursor.fetchone()[0]  # Fetch the count result
