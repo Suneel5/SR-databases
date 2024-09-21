@@ -130,7 +130,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2024-4-20', '%Y-%m-%d')
+end_date = datetime.strptime('2024-3-20', '%Y-%m-%d')
 start_date = datetime.strptime('2024-01-16', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -167,7 +167,7 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>30:
+    if i>10:
         break
     i+=1
 
