@@ -16,7 +16,7 @@ import re
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
+from external_api import zen_api
 load_dotenv()   
 
 import praw
@@ -55,47 +55,33 @@ def post_exists(post_id, df):
     """Check if a post already exists in the DataFrame based on postid."""
     return post_id in df['postid'].values
 
-# to use browser in background without displayingo on screen
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")  # User-agent spoofing
-
-# Initialize the WebDriver 
-# driver = webdriver.Chrome(options=chrome_options)
-# Initialize the WebDriver 
-driver = webdriver.Chrome()
 
 df2=pd.read_csv('posts_url/links_from_redditapi.csv')
+
+  
+
 def get_page_save_links(url,min_date,df):  
 
-    # soup = BeautifulSoup(response.content, "html.parser")
-    proxy=None
-    proxies = {"https": proxy, "http": proxy} if proxy and (proxy.startswith("https") or proxy.startswith("http")) else None
+    # response=requests.get(url,
+    #                     headers={
+    #             "User-Agent": get_useragent()
+    #         }
+    #         )
+    response=zen_api(url)
 
-    response=requests.get(url,
-                        headers={
-                "User-Agent": get_useragent()
-            },
-            proxies=None)
+    time.sleep(7)
     
-    # Open page
-    # driver.get(url)
-    time.sleep(11)
-    # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    # time.sleep(4)
-    # response=driver.page_source
-            
-    soup=BeautifulSoup(response,'html5lib')
+    soup=BeautifulSoup(response.content,'html5lib')
     # soup=BeautifulSoup(response.text,'html5lib')
     result_block = soup.find_all("div", attrs={"class": "g"})
-
+    print()
+    print(url)
     results_no=0
     if not result_block:
         print(f"No results found for the URL: {url}")
         return df, 0
+        # exit()
+
     for result in result_block:
         link = result.find("a", href=True)['href']
         postid=extract_postid(link)
@@ -120,7 +106,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2024-08-29', '%Y-%m-%d')
+end_date = datetime.strptime('2024-02-19', '%Y-%m-%d')
 start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -151,21 +137,23 @@ while current_date >= start_date:
         if no_of_output >= 10:
             print(f'Opening page {start_page // 10 + 2}')
             start_page += 10  # Increment for the next page
+            delay = random.uniform(2, 6) 
+            print(f"Sleeping for {delay:.2f} seconds")
 
     # Add random delay between iterations 
-    delay = random.uniform(3, 7)
     print(f'counter:{i}\n')
+    delay = random.uniform(6, 12) 
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
     
     # Move to the previous day
     current_date = prev_day
     
-    if i>3:
+    if i>4:
         break
     i+=1
 
-driver.close()
+# driver.close()
 
 
 

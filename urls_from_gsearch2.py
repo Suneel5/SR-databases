@@ -15,6 +15,9 @@ import re
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import undetected_chromedriver as uc
+import itertools
+
 
 # df=pd.read('')
 def get_useragent():
@@ -50,35 +53,49 @@ def post_exists(post_id, df):
     """Check if a post already exists in the DataFrame based on postid."""
     return post_id in df['postid'].values
 
-# to use browser in background without displayingo on screen
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")  # User-agent spoofing
+# define a proxy list
+proxy_pool = [
+    # "https://72.10.160.94:8355",
+    # "http://116.108.3.8:10002",
+    "http://171.238.238.8:5000",
+    "https://116.105.58.35:10004"
+]
+#     proxies={
+#      'http':"http://197.255.125.12:80",
+#     "https":"//197.255.125.12:80"
+# }
 
-# Initialize the WebDriver 
-# driver = webdriver.Chrome(options=chrome_options)
-# Initialize the WebDriver 
-driver = webdriver.Chrome()
+def rotate_proxy(proxy_list: list):
+    # shuffle the proxy list
+    random.shuffle(proxy_list)
+
+    # return a generator that cycles through the proxy list
+    return itertools.cycle(proxy_list)
+
+options = uc.ChromeOptions()
+# proxy = next(rotate_proxy(proxy_pool))
+# print('*'*50)
+# print(f"Proxy: {proxy}")
+# print('#'*50)
+# options.add_argument(f'--proxy-server={proxy}')
+# options.add_argument("--headless")
+# options.add_argument("--no-sandbox")
+# options.add_argument("--disable-gpu")
+# options.add_argument("--disable-dev-shm-usage")
+driver = uc.Chrome(options=options)
 
 df2=pd.read_csv('posts_url/links_from_redditapi.csv')
+
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")
-    proxy=None
-    proxies = {"https": proxy, "http": proxy} if proxy and (proxy.startswith("https") or proxy.startswith("http")) else None
-
-    # response=requests.get(url,
-    #                     headers={
-    #             "User-Agent": get_useragent()
-    #         },
-    #         proxies=None)
     
     # Open page
+    # Add the random User-Agent to the options
+
+    time.sleep(3)
     driver.get(url)
-    time.sleep(16)
+    time.sleep(12)
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(2)
     response=driver.page_source
@@ -90,6 +107,7 @@ def get_page_save_links(url,min_date,df):
     results_no=0
     if not result_block:
         print(f"No results found for the URL: {url}")
+        # driver.quit()
         return df, 0
     for result in result_block:
         link = result.find("a", href=True)['href']
@@ -105,16 +123,19 @@ def get_page_save_links(url,min_date,df):
             df = pd.concat([df, new_row], ignore_index=True)
         else:
             print(f'Post: {postid} Already exists in csv file')
+            # driver.quit()
 
     # Save the updated DataFrame to the CSV file for every requests
     df.to_csv(csv_file, index=False)
     print(f"\nData has been written to {csv_file} successfully.\n")
+    # driver.quit()
     return df, len(result_block)
+    
 
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
-end_date = datetime.strptime('2024-07-28', '%Y-%m-%d')
+end_date = datetime.strptime('2024-02-7', '%Y-%m-%d')
 start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -145,21 +166,22 @@ while current_date >= start_date:
         if no_of_output >= 10:
             print(f'Opening page {start_page // 10 + 2}')
             start_page += 10  # Increment for the next page
+            delay = random.uniform(1, 5) 
+            print(f"Sleeping for {delay:.2f} seconds")
 
     # Add random delay between iterations 
     delay = random.uniform(1, 6)
     print(f'counter:{i}\n')
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
-    
     # Move to the previous day
     current_date = prev_day
     
-    if i>4:
+    if i>7:
         break
     i+=1
 
-driver.close()
+driver.quit()
 
 
 
