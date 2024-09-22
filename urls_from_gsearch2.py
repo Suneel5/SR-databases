@@ -135,7 +135,7 @@ def get_page_save_links(url,min_date,df):
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
-end_date = datetime.strptime('2024-02-7', '%Y-%m-%d')
+end_date = datetime.strptime('2023-12-25', '%Y-%m-%d')
 start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -177,7 +177,7 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>7:
+    if i>2:
         break
     i+=1
 

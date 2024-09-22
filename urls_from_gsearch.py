@@ -19,7 +19,6 @@ from selenium.webdriver.chrome.options import Options
 from external_api import zen_api
 load_dotenv()   
 
-import praw
 
 # df=pd.read('')
 def get_useragent():
@@ -43,6 +42,7 @@ def extract_postid(link):
     
 # Initialize or load the CSV file if it exists
 csv_file = 'posts_url/links.csv'
+# csv_file = 'links.csv'
 
 if os.path.exists(csv_file):
     # Load the existing CSV file
@@ -57,19 +57,32 @@ def post_exists(post_id, df):
 
 
 df2=pd.read_csv('posts_url/links_from_redditapi.csv')
+# df2=pd.read_csv('links_from_redditapi.csv')
 
-  
+
+PROXY_LIST = [
+    "http://203.24.108.161:80",
+    "http://80.48.119.28:8080",
+    "http://203.30.189.47:80",
+]
+
+def get_random_proxy():
+    return random.choice(PROXY_LIST)
+
 
 def get_page_save_links(url,min_date,df):  
 
+    # proxy=get_random_proxy()
     # response=requests.get(url,
     #                     headers={
-    #             "User-Agent": get_useragent()
+    #             "User-Agent": get_useragent(),
+                   # # proxies={"http": proxy, "https": proxy}
+
     #         }
     #         )
     response=zen_api(url)
 
-    time.sleep(7)
+    time.sleep(2)
     
     soup=BeautifulSoup(response.content,'html5lib')
     # soup=BeautifulSoup(response.text,'html5lib')
@@ -106,7 +119,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2024-02-19', '%Y-%m-%d')
+end_date = datetime.strptime('2023-5-26', '%Y-%m-%d')
 start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -137,19 +150,19 @@ while current_date >= start_date:
         if no_of_output >= 10:
             print(f'Opening page {start_page // 10 + 2}')
             start_page += 10  # Increment for the next page
-            delay = random.uniform(2, 6) 
-            print(f"Sleeping for {delay:.2f} seconds")
+            # delay = random.uniform(1, 4) 
+            # print(f"Sleeping for {delay:.2f} seconds")
 
     # Add random delay between iterations 
     print(f'counter:{i}\n')
-    delay = random.uniform(6, 12) 
+    delay = random.uniform(1, 4) 
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
     
     # Move to the previous day
     current_date = prev_day
     
-    if i>4:
+    if i>15:
         break
     i+=1
 
