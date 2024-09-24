@@ -7,6 +7,7 @@ import random
 from dotenv import load_dotenv
 from manage_database import *
 from get_data import get_data_save
+from manage_database import post_exists_in_db
 
 # Load environment variables
 load_dotenv()
@@ -25,14 +26,13 @@ reddit = praw.Reddit(
 # Print the Reddit user
 print(f"Authenticated as: {reddit.user.me()}\n")
 
-
 csv_file = 'posts_url/new_posts.csv'
 df = pd.DataFrame(columns=['url', 'postid', 'min_date'])
 
 df1=pd.read_csv('posts_url/links_from_redditapi.csv')
 df2=pd.read_csv('posts_url/links.csv')
 # Define the subreddit and categories
-subreddit = reddit.subreddit('RealEstate')
+subreddit = reddit.subreddit('realestateinvesting')
 categories = ['new', 'rising','hot']
 
 def get_posts_from_category(category):
@@ -44,9 +44,7 @@ def get_posts_from_category(category):
     elif category == 'rising':
         return subreddit.rising(limit=1000)
 
-def post_exists(post_id, df):
-    """Check if a post already exists in the DataFrame based on postid."""
-    return post_id in df['postid'].values
+connection = connect_to_db()  # Connect to the database
 
 # Loop through each category and fetch posts
 for category in categories:
@@ -61,8 +59,8 @@ for category in categories:
         # Get only the date part
         date_only = date_posted.date()
         
-        # Check if the post already exists in the CSV file
-        if not post_exists(post_id, df) and not post_exists(post_id,df1) and not post_exists(post_id,df2):
+        # Check if the post already exists in the Database
+        if not post_exists_in_db(connection,post_id):
             print(f"New Post - URL: {post.url}")
             
             # Create a dictionary for the new post
@@ -71,35 +69,24 @@ for category in categories:
                 'postid': post_id,
                 'min_date': date_only
             }
-            
             # Add new post to the DataFrame
             new_row = pd.DataFrame([new_post])
             df = pd.concat([df, new_row], ignore_index=True)
-        
-            # Save the updated DataFrame to the CSV file
-            df.to_csv(csv_file, index=False)
-            print(f"Post saved to {csv_file}.")
+            #add new post to database
+            get_data_save(post_id,connection)
+            time.sleep(1)
+            
         else:
-            print(f"Post {post_id} already exists in CSV.")
+            print(f"Post {post_id} already exists in Database")
 
     # Add a random delay between category fetches to avoid rate limits
     delay = random.uniform(3, 7)
     print(f"\nWaiting {delay:.2f} seconds before fetching the next category...\n")
     time.sleep(delay)
 
-print("\n Got All New categories processed.")
-
-print("\nAdding New posts to database.")
-
-# Step 1: Database Initialization
-create_database_if_not_exists()  # Create database if not exists
-connection = connect_to_db()  # Connect to the database
-create_tables(connection)  # Create tables if not exist
-
-#  get data for new all postid and save it in db
-for postid in df['postid'].values:
-    get_data_save(postid,connection)
-    time.sleep(2)
+# Save the updated DataFrame to the CSV file
+df.to_csv(csv_file, index=False)
+print(f"New Post saved to {csv_file} too.")
 
 # Close the DB connection
 if connection.is_connected():
