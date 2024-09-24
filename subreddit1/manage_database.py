@@ -1,9 +1,15 @@
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
+# Load environment variables
+load_dotenv()
 
 # Function to create a database if it doesn't exist
 def create_database_if_not_exists():
     try:
+        user=os.getenv('user')
+        password=os.getenv(password)
         connection = mysql.connector.connect(
             host='localhost',
             user='root',  #  MySQL username
@@ -22,6 +28,8 @@ def create_database_if_not_exists():
 # Function to connect to the MySQL database
 def connect_to_db():
     try:
+        user=os.getenv('user')
+        password=os.getenv(password)
         connection = mysql.connector.connect(
             host='localhost',
             user='root',  # Replace with your MySQL username

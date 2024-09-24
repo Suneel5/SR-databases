@@ -5,8 +5,6 @@ import pandas as pd
 import time
 import random
 from dotenv import load_dotenv
-
-
 # Load environment variables
 load_dotenv()
 

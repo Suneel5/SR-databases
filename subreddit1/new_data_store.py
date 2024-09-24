@@ -74,7 +74,7 @@ for category in categories:
             df = pd.concat([df, new_row], ignore_index=True)
             #add new post to database
             get_data_save_(post_id,connection)
-            time.sleep(1)
+            # time.sleep(1)
             
         else:
             print(f"Post {post_id} already exists in Database")

@@ -74,7 +74,7 @@ for category in categories:
             df = pd.concat([df, new_row], ignore_index=True)
             #add new post to database
             get_data_save_(post_id,connection)
-            time.sleep(1)
+            # time.sleep(1)
             
         else:
             print(f"Post {post_id} already exists in Database")
@@ -86,7 +86,7 @@ for category in categories:
 
 # Save the updated DataFrame to the CSV file
 df.to_csv(csv_file, index=False)
-print(f"New Post saved to {csv_file} too.")
+print(f"New Posts saved to {csv_file} too.")
 
 # Close the DB connection
 if connection.is_connected():
