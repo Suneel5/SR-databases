@@ -56,8 +56,11 @@ The database consists of the following four tables: `title`, `comments`, `re_tit
 
 ## Data Extraction and Storage
 The script get_data_save.py is used to extract post information (title, tag, description, comments, replies) and save it to a database.<b>
-To create database from  Scratch , Run the command: 
+To create database from  Scratch ,follow these steps:
 
+1. Open a terminal in the required folder (subreddit1 or subreddit2).
+
+2.  Run the command: 
 ```bash
 python get_data_save.py
 ```
