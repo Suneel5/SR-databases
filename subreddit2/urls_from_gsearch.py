@@ -60,11 +60,7 @@ df2=pd.read_csv('posts_url/links_from_redditapi.csv')
 # df2=pd.read_csv('links_from_redditapi.csv')
 
 
-PROXY_LIST = [
-    "http://203.24.108.161:80",
-    "http://80.48.119.28:8080",
-    "http://203.30.189.47:80",
-]
+PROXY_LIST = [ ]
 
 def get_random_proxy():
     return random.choice(PROXY_LIST)
@@ -73,12 +69,14 @@ def get_random_proxy():
 def get_page_save_links(url,min_date,df):  
 
     # proxy=get_random_proxy()
+
     # response=requests.get(url,
     #                     headers={
     #             "User-Agent": get_useragent(),
     #                # proxies={"http": proxy, "https": proxy}
     #         }
     #         )
+    
     response=zen_api(url)
 
     time.sleep(2)
@@ -118,8 +116,8 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2022-7-26', '%Y-%m-%d')
-start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
+end_date = datetime.strptime('2016-4-30', '%Y-%m-%d') 
+start_date = datetime.strptime('2011-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
@@ -129,12 +127,12 @@ while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=4)
+    prev_day = current_date - timedelta(days=25)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
     # Initialize variables for pagination
-    start_page = 0
+    start_page=0
     no_of_output = 10  # Initial condition to enter the pagination loop
     
     # Pagination loop, continues until no_of_output < 10
@@ -150,26 +148,25 @@ while current_date >= start_date:
             print(f'Opening page {start_page // 10 + 2}')
             start_page += 10  # Increment for the next page
             delay = random.uniform(1, 4) 
+            # delay = random.uniform(4, 8)
             print(f"Sleeping for {delay:.2f} seconds")
             time.sleep(delay)
 
     # Add random delay between iterations 
     print(f'counter:{i}\n')
-    delay = random.uniform(1, 3) 
+    delay = random.uniform(1, 5) 
+    # delay = random.uniform(5, 10) 
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
     
     # Move to the previous day
     current_date = prev_day
     
-    if i>22:
+    if i>20:
         break
     i+=1
 
 # driver.close()
-
-
-
 
 
     

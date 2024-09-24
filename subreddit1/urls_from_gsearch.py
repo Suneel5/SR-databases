@@ -42,7 +42,7 @@ def extract_postid(link):
     return None
     
 # Initialize or load the CSV file if it exists
-csv_file = 'links.csv'
+csv_file = 'posts_url/links.csv'
 
 if os.path.exists(csv_file):
     # Load the existing CSV file
@@ -77,7 +77,7 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
 # Initialize the WebDriver 
 driver = webdriver.Chrome()
 
-df2=pd.read_csv('links_from_redditapi.csv')
+df2=pd.read_csv('posts_url/links_from_redditapi.csv')
 def get_page_save_links(url,min_date,df):  
 
     # soup = BeautifulSoup(response.content, "html.parser")

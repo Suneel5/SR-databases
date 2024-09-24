@@ -39,7 +39,7 @@ def create_tables(connection):
     try:
         cursor = connection.cursor()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS RE_titles (
+            CREATE TABLE IF NOT EXISTS RE_title (
                 postno INT AUTO_INCREMENT  UNIQUE,
                 titleid VARCHAR(255) PRIMARY KEY,
                 title TEXT,
@@ -55,7 +55,7 @@ def create_tables(connection):
                 titleid VARCHAR(255),
                 userid VARCHAR(255),
                 comment TEXT,
-                FOREIGN KEY (titleid) REFERENCES title(titleid)
+                FOREIGN KEY (titleid) REFERENCES RE_title(titleid)
             )
         ''')
         print("Tables 'RE_title' and 'RE_comments' created or already exist.")
@@ -92,7 +92,7 @@ def save_comments_to_db(connection, titleid,userid, comment):
         '''
         cursor.execute(insert_comment_query, (titleid,userid, comment))
         connection.commit()
-        print(f"Comment/replies inserted for titleid: {titleid}")
+        # print(f"Comment/replies inserted for titleid: {titleid}")
     except Error as e:
         print(f"Error while inserting comment: {e}")
     finally:

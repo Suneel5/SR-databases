@@ -43,7 +43,7 @@ def extract_postid(link):
     return None
 
 # Initialize or load the CSV file if it exists
-csv_file = 'link_from_tags.csv'
+csv_file = 'posts_url/link_from_tags.csv'
 if os.path.exists(csv_file):
     # Load the existing CSV file
     df = pd.read_csv(csv_file)
@@ -123,8 +123,8 @@ def url_from_tag(tag,df):
 
 
 #combine links csv
-df1=pd.read_csv('links.csv')
-df2=pd.read_csv('links_from_redditapi.csv')
+df1=pd.read_csv('posts_url/links.csv')
+df2=pd.read_csv('posts_url/links_from_redditapi.csv')
 
 final_df= pd.concat([df1, df2], ignore_index=True)
 
@@ -132,7 +132,7 @@ final_df= pd.concat([df1, df2], ignore_index=True)
 final_df = final_df.drop_duplicates(subset='postid')
 
 tags=['Rehabbing/Flipping', 'Commercial Real Estate', 'Legal', 'Self-Directed/Retirement Investing', 'Insurance', 'Wholesaling', 'Education', 'Foreclosure', 'Notes/Paper', 'Rent or Sell my House?', 'Property Management', '1031 Exchange', 'Multi-Family', '$20K Cabins', 'Land', 'Single Family Home', 'Vacation Rentals', 'Property Maintenance', 'Deal Structure', ' ', 'Humor', 'Foreign Investment', 'Construction', 'Finance', 'New Investor', 'Discussion', 'Self-Promotion - Monthly', 'Marketing', 'Software', 'Motivation - Monthly', 'Manufactured/Mobile Home', 'Taxes']
-# tags_df=pd.read_csv('tags.csv')
+# tags_df=pd.read_csv('posts_url/tags.csv')
 # tags=tags_df['tag'].values
 print(tags)
 for tag in tags[14:]:

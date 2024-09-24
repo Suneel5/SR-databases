@@ -91,7 +91,7 @@ def save_comments_to_db(connection, titleid,userid, comment):
         '''
         cursor.execute(insert_comment_query, (titleid,userid, comment))
         connection.commit()
-        print(f"Comment/replies inserted for titleid: {titleid}")
+        # print(f"Comment/replies inserted for titleid: {titleid}")
     except Error as e:
         print(f"Error while inserting comment: {e}")
     finally:

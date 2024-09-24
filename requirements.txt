@@ -6,4 +6,5 @@ python-dotenv==1.0.1
 praw
 mysql-connector-python
 pandas
+undetected-chromedriver
 

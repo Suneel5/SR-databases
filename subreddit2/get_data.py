@@ -48,36 +48,36 @@ def get_data_save(post_id,connection):
         print(f"Tag: {tag}")
         # print(f"Description: {description}")
         # Check if the post already exists in the database
-        if not post_exists_in_db(connection, post_id):
-                # If the post does not exist, insert the post details
-                print('Writing data in db')
-                save_data_to_db(connection, post_id, title, tag, description)
+        
+        # If the post does not exist, insert the post details
+        print(f'Writing data in db for post :{post_id}')
+        save_data_to_db(connection, post_id, title, tag, description)
 
-                # Enable comment forest expansion to ensure nested comments are loaded
-                submission.comments.replace_more(limit=None)
-                # Iterate through the comments
-                # print('Comments: ')
-                comments=[]
-                for top_level_comment in submission.comments:
-                        # Retrieve the comment author
-                        comment_author = top_level_comment.author
-                        comment_author_name = comment_author.name if comment_author else "Unknown"
-                        # Add comment to the comments list
+        # Enable comment forest expansion to ensure nested comments are loaded
+        submission.comments.replace_more(limit=None)
+        # Iterate through the comments
+        # print('Comments: ')
+        comments=[]
+        for top_level_comment in submission.comments:
+                # Retrieve the comment author
+                comment_author = top_level_comment.author
+                comment_author_name = comment_author.name if comment_author else "Unknown"
+                # Add comment to the comments list
+                
+                save_comments_to_db(connection, post_id,comment_author_name, top_level_comment.body)
+                # print(f'{comment_author_name}: {top_level_comment.body}\n') 
+
+                # print("Replies: ")
+                for reply in top_level_comment.replies:
+                        # Retrieve the reply author
+                        reply_author = reply.author
+                        reply_author_name = reply_author.name if reply_author else "Unknown"
+                        # Add reply to the comments list
                         
-                        save_comments_to_db(connection, post_id,comment_author_name, top_level_comment.body)
-                        # print(f'{comment_author_name}: {top_level_comment.body}\n') 
-
-                        # print("Replies: ")
-                        for reply in top_level_comment.replies:
-                                # Retrieve the reply author
-                                reply_author = reply.author
-                                reply_author_name = reply_author.name if reply_author else "Unknown"
-                                # Add reply to the comments list
-                                
-                                save_comments_to_db(connection, post_id,reply_author_name, reply.body)
-                                # print(f"{reply_author_name}:{reply.body}")
-                # After gathering all comments and replies, insert them into the database
-                print('-' * 50)
+                        save_comments_to_db(connection, post_id,reply_author_name, reply.body)
+                        # print(f"{reply_author_name}:{reply.body}")
+        print(f"Comments and replies inserted for titleid: {postid}")
+        print('-' * 50)
 
 
 #combine links csv
@@ -88,20 +88,23 @@ final_df= pd.concat([df1, df2], ignore_index=True)
 
 #remove duplicates post id
 final_df = final_df.drop_duplicates(subset='postid')
+final_df = final_df[final_df['postid'].notnull()]
 final_df.to_csv('posts_url/final_links.csv', index=False)
-print(f"\nData has been written to 'final_links.csv' successfully.\n")
-
+print(f"\nfinal_links.csv created. \n")
 
 # Step 1: Database Initialization
 create_database_if_not_exists()  # Create database if not exists
 connection = connect_to_db()  # Connect to the database
 create_tables(connection)  # Create tables if not exist
 
-
 # call get data for all postid
-# for postid in final_df['postid'].values[:4000]:
-#     get_data_save(postid,connection)
-#     time.sleep(2)
+for postid in final_df['postid'].values:
+    # Check if the post already exists in the database
+    if not post_exists_in_db(connection, postid):
+        get_data_save(postid,connection)
+        time.sleep(1)
+    else:
+          print(f'Post {postid} Already in Database!!!')
 
 
 # Close the DB connection
@@ -110,15 +113,15 @@ if connection.is_connected():
     print("MySQL connection is closed")
 
 
-tags=set(tags)
-tags=list(tags)
+# tags=set(tags)
+# tags=list(tags)
 
-print(tags)
+# print(tags)
 # Convert the list to a DataFrame
-df = pd.DataFrame(tags, columns=['tag'])
+# df = pd.DataFrame(tags, columns=['tag'])
 
 # Save the DataFrame to a CSV file (one element per row)
-df.to_csv('tags.csv', index=False)
+# df.to_csv('tags.csv', index=False)
 
 # Record the end time
 end_time = datetime.now()

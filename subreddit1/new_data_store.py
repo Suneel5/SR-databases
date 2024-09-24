@@ -5,7 +5,8 @@ import pandas as pd
 import time
 import random
 from dotenv import load_dotenv
-
+from manage_database import *
+from get_data import get_data_save
 
 # Load environment variables
 load_dotenv()
@@ -24,25 +25,20 @@ reddit = praw.Reddit(
 # Print the Reddit user
 print(f"Authenticated as: {reddit.user.me()}\n")
 
-# Initialize or load the CSV file if it exists
-csv_file = 'posts_url/links_from_redditapi.csv'
-if os.path.exists(csv_file):
-    # Load the existing CSV file
-    df = pd.read_csv(csv_file)
-else:
-    # Create an empty DataFrame if the file doesn't exist
-    df = pd.DataFrame(columns=['url', 'postid', 'min_date'])
 
+csv_file = 'posts_url/new_posts.csv'
+df = pd.DataFrame(columns=['url', 'postid', 'min_date'])
+
+df1=pd.read_csv('posts_url/links_from_redditapi.csv')
+df2=pd.read_csv('posts_url/links.csv')
 # Define the subreddit and categories
-subreddit = reddit.subreddit('realestateinvesting')
-categories = ['hot', 'top', 'new', 'rising']
+subreddit = reddit.subreddit('RealEstate')
+categories = ['new', 'rising','hot']
 
 def get_posts_from_category(category):
     """Fetch posts from a specific category."""
     if category == 'hot':
         return subreddit.hot(limit=1000)
-    elif category == 'top':
-        return subreddit.top(limit=1000)
     elif category == 'new':
         return subreddit.new(limit=1000)
     elif category == 'rising':
@@ -62,22 +58,24 @@ for category in categories:
         # Convert Unix timestamp to human-readable format
         date_posted = datetime.fromtimestamp(post.created_utc)
         post_id = post.id
+        # Get only the date part
+        date_only = date_posted.date()
         
         # Check if the post already exists in the CSV file
-        if not post_exists(post_id, df):
-            print(f"New Post - URL: {post.url}, Post ID: {post_id}, Date Posted: {date_posted}")
+        if not post_exists(post_id, df) and not post_exists(post_id,df1) and not post_exists(post_id,df2):
+            print(f"New Post - URL: {post.url}")
             
             # Create a dictionary for the new post
             new_post = {
                 'url': post.url,
                 'postid': post_id,
-                'min_date': date_posted
+                'min_date': date_only
             }
             
             # Add new post to the DataFrame
             new_row = pd.DataFrame([new_post])
             df = pd.concat([df, new_row], ignore_index=True)
-            
+        
             # Save the updated DataFrame to the CSV file
             df.to_csv(csv_file, index=False)
             print(f"Post saved to {csv_file}.")
@@ -89,4 +87,26 @@ for category in categories:
     print(f"\nWaiting {delay:.2f} seconds before fetching the next category...\n")
     time.sleep(delay)
 
-print("\nAll categories processed.")
+print("\n Got All New categories processed.")
+
+print("\nAdding New posts to database.")
+
+# Step 1: Database Initialization
+create_database_if_not_exists()  # Create database if not exists
+connection = connect_to_db()  # Connect to the database
+create_tables(connection)  # Create tables if not exist
+
+#  get data for new all postid and save it in db
+for postid in df['postid'].values:
+    get_data_save(postid,connection)
+    time.sleep(2)
+
+# Close the DB connection
+if connection.is_connected():
+    connection.close()
+    print("MySQL connection is closed")
+
+print("All new post added to database")
+
+
+
