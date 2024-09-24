@@ -32,8 +32,8 @@ df = pd.DataFrame(columns=['url', 'postid', 'min_date'])
 
 # Define the subreddit and categories
 subreddit = reddit.subreddit('RealEstate')
-# categories = ['new', 'rising','hot']
-categories=['new']
+categories = ['new', 'rising','hot']
+# categories=['new']
 
 def get_posts_from_category(category):
     """Fetch posts from a specific category."""

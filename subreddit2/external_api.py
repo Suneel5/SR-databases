@@ -3,7 +3,7 @@
 
 import requests
 def zen_api(url):
-    apikey = 'e13f7e1d92f991a2871a4e9420f659b0fb922a50'
+    apikey = ' '
     params = {
         'url': url,
         'apikey': apikey,
