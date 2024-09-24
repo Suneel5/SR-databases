@@ -32,25 +32,21 @@ reddit = praw.Reddit(
 #     user_name=user_name
 )
 tags=[]
-def get_data_save(post_id,connection):
+def get_data_save_(post_id,connection):
         # Define the post ID 
+        print(f'Title ID: {post_id}')
         submission = reddit.submission(id=post_id)
         
-        # Print post details
-        
-        title=submission.title if submission.title else ' '
-        
+        title=submission.title if submission.title else ' '     
         description=submission.selftext if submission.selftext else ' '
         tag=submission.link_flair_text if submission.link_flair_text else ' '
-        tags.append(tag)
-        print(f'Post ID: {post_id}')
+        # tags.append(tag)
         # print(f"Title: {title}")
-        print(f"Tag: {tag}")
+        # print(f"Tag: {tag}")
         # print(f"Description: {description}")
-        # Check if the post already exists in the database
-        
+
         # If the post does not exist, insert the post details
-        print(f'Writing data in db for post :{post_id}')
+        print(f'Writing data in db for post : {postid}')
         save_data_to_db(connection, post_id, title, tag, description)
 
         # Enable comment forest expansion to ensure nested comments are loaded
@@ -80,29 +76,32 @@ def get_data_save(post_id,connection):
         print('-' * 50)
 
 
+
 #combine links csv
 df1=pd.read_csv('posts_url/links.csv')
 df2=pd.read_csv('posts_url/links_from_redditapi.csv')
+df3=pd.read_csv('posts_url/link_from_tags.csv')
 
-final_df= pd.concat([df1, df2], ignore_index=True)
+final_df= pd.concat([df1, df2, df3], ignore_index=True)
 
-#remove duplicates post id
+#remove duplicates and remove rows if any null titleid post id
 final_df = final_df.drop_duplicates(subset='postid')
 final_df = final_df[final_df['postid'].notnull()]
 final_df.to_csv('posts_url/final_links.csv', index=False)
-print(f"\nfinal_links.csv created. \n")
+print(f"\nData has been written to 'final_links.csv' successfully.\n")
 
 # Step 1: Database Initialization
 create_database_if_not_exists()  # Create database if not exists
 connection = connect_to_db()  # Connect to the database
 create_tables(connection)  # Create tables if not exist
 
+
 # call get data for all postid
 for postid in final_df['postid'].values:
     # Check if the post already exists in the database
     if not post_exists_in_db(connection, postid):
         get_data_save(postid,connection)
-        time.sleep(1)
+        # time.sleep(0.5)
     else:
           print(f'Post {postid} Already in Database!!!')
 
@@ -117,11 +116,11 @@ if connection.is_connected():
 # tags=list(tags)
 
 # print(tags)
-# Convert the list to a DataFrame
+# # Convert the list to a DataFrame
 # df = pd.DataFrame(tags, columns=['tag'])
 
 # Save the DataFrame to a CSV file (one element per row)
-# df.to_csv('tags.csv', index=False)
+# df.to_csv('posts_url/tags.csv', index=False)
 
 # Record the end time
 end_time = datetime.now()

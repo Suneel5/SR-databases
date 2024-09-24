@@ -6,7 +6,7 @@ import time
 import random
 from dotenv import load_dotenv
 from manage_database import *
-from get_data import get_data_save
+from get_data_save import get_data_save_
 from manage_database import post_exists_in_db
 
 # Load environment variables
@@ -73,7 +73,7 @@ for category in categories:
             new_row = pd.DataFrame([new_post])
             df = pd.concat([df, new_row], ignore_index=True)
             #add new post to database
-            get_data_save(post_id,connection)
+            get_data_save_(post_id,connection)
             time.sleep(1)
             
         else:
