@@ -29,11 +29,11 @@ print(f"Authenticated as: {reddit.user.me()}\n")
 csv_file = 'posts_url/new_posts.csv'
 df = pd.DataFrame(columns=['url', 'postid', 'min_date'])
 
-df1=pd.read_csv('posts_url/links_from_redditapi.csv')
-df2=pd.read_csv('posts_url/links.csv')
+
 # Define the subreddit and categories
 subreddit = reddit.subreddit('RealEstate')
-categories = ['new', 'rising','hot']
+# categories = ['new', 'rising','hot']
+categories=['new']
 
 def get_posts_from_category(category):
     """Fetch posts from a specific category."""
