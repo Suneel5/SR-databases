@@ -35,7 +35,7 @@ else:
 
 # Define the subreddit and categories
 subreddit = reddit.subreddit('RealEstate')
-categories = ['hot', 'top', 'new', 'rising']
+categories = [ 'new', 'rising','hot', 'top']
 
 def get_posts_from_category(category):
     """Fetch posts from a specific category."""
