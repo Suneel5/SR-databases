@@ -4,7 +4,7 @@ This project involves scraping posts from subreddits and creating a database to 
 
 ## Installation
 
-To install the required libraries, run the following command:
+To install the required dependencies, run the following command:
 
 ```bash
 pip install -r requirements.txt
