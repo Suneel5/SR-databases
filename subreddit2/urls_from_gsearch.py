@@ -116,7 +116,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2016-4-30', '%Y-%m-%d') 
+end_date = datetime.strptime('2014-12-17', '%Y-%m-%d') 
 start_date = datetime.strptime('2011-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
