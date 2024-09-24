@@ -54,6 +54,17 @@ The database consists of the following four tables: `title`, `comments`, `re_tit
 - The `comments` table references the `title` table via `titleid`.
 - The `re_comments` table references the `re_titles` table via `titleid`.
 
+## Data Extraction and Storage
+The script get_data_save.py is used to extract post information (title, tag, description, comments, replies) and save it to a database.<b>
+To create database from  Scratch , Run the command: 
+
+```bash
+python get_data_save.py
+```
+
+If there is already `posts` database with all entries then no any data will be added to database.  if csv file is updated then new entries will be added to database. 
+
+
 ## Adding New Posts to the Database
 To add new posts from the subreddit into the existing database, follow these steps:
 
@@ -64,7 +75,6 @@ To add new posts from the subreddit into the existing database, follow these ste
 python new_data_store.py
 ```
 3. The new posts will be automatically added to the database
-
 
 
 ## Data Collection Methods
@@ -82,9 +92,6 @@ Posts are collected from different sources:
 
 All post links are saved in CSV format within the `posts_url` folder.
 
-
-## Data Extraction and Storage
-The script get_save_data.py is used to extract post information (title, tag, description, comments, replies) and save it to a database.
 
 
 
