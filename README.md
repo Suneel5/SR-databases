@@ -54,6 +54,18 @@ The database consists of the following four tables: `title`, `comments`, `re_tit
 - The `comments` table references the `title` table via `titleid`.
 - The `re_comments` table references the `re_titles` table via `titleid`.
 
+## Adding New Posts to the Database
+To add new posts from the subreddit into the existing database, follow these steps:
+
+1. Open a terminal in the required folder (subreddit1 or subreddit2).
+
+2. Run the following command:
+ ```bash
+python new_data_store.py
+```
+3. The new posts will be automatically added to the database
+
+
 
 ## Data Collection Methods
 
@@ -75,16 +87,6 @@ All post links are saved in CSV format within the `posts_url` folder.
 The script get_save_data.py is used to extract post information (title, tag, description, comments, replies) and save it to a database.
 
 
-## Adding New Posts to the Database
-To add new posts from the subreddit into the database, follow these steps:
-
-1. Open a terminal in the required folder (subreddit1 or subreddit2).
-
-2. Run the following command:
- ```bash
-python new_data_store.py
-```
-3. The new posts will be automatically added to the database
 
 
 
