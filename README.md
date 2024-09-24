@@ -37,18 +37,18 @@ The database consists of the following four tables: `title`, `comments`, `re_tit
 |-------------|------------|-------------------------------------|
 | postno      | INT        | Unique post number                  |
 | titleid     | VARCHAR    | Unique identifier for the title     |
-| title       | VARCHAR    | Title of the reposted item          |
+| title       | VARCHAR    | Title of the post                   |
 | tag         | VARCHAR    | Associated tag(s)                   |
-| description | TEXT       | Description of the reposted item    |
-| source      | VARCHAR    | Source of the reposted item         |
+| description | TEXT       | Description of the posts            |
+| source      | VARCHAR    | Source                              |
 
 ### 4. `re_comments`
 | Column Name  | Data Type | Description                                     |
 |--------------|------------|-------------------------------------------------|
 | commented    | VARCHAR   | Unique identifier for the comment                |
 | titleid      | VARCHAR   | Foreign key referencing `re_titles.titleid`      |
-| userid       | VARCHAR   | ID of the user who commented on the repost       |
-| comment      | TEXT      | Reposted comment text                            |
+| userid       | VARCHAR   | ID Name of the user who commented                |
+| comment      | TEXT      | comment text                                     |
 
 ### Relationships
 - The `comments` table references the `title` table via `titleid`.
