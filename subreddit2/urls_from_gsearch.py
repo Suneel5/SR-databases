@@ -70,14 +70,14 @@ def get_page_save_links(url,min_date,df):
 
     # proxy=get_random_proxy()
 
-    # response=requests.get(url,
-    #                     headers={
-    #             "User-Agent": get_useragent(),
-    #                # proxies={"http": proxy, "https": proxy}
-    #         }
-    #         )
+    response=requests.get(url,
+                        headers={
+                "User-Agent": get_useragent(),
+                   # proxies={"http": proxy, "https": proxy}
+            }
+            )
     
-    response=zen_api(url)
+    # response=zen_api(url)
 
     time.sleep(2)
     
@@ -116,7 +116,7 @@ def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
 
-end_date = datetime.strptime('2014-12-17', '%Y-%m-%d') 
+end_date = datetime.strptime('2024-9-9', '%Y-%m-%d') 
 start_date = datetime.strptime('2011-01-01', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
@@ -127,7 +127,7 @@ while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=25)
+    prev_day = current_date - timedelta(days=2)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
@@ -147,22 +147,22 @@ while current_date >= start_date:
         if no_of_output >= 10:
             print(f'Opening page {start_page // 10 + 2}')
             start_page += 10  # Increment for the next page
-            delay = random.uniform(1, 4) 
-            # delay = random.uniform(4, 8)
+            # delay = random.uniform(1, 4) 
+            delay = random.uniform(4, 8)
             print(f"Sleeping for {delay:.2f} seconds")
             time.sleep(delay)
 
     # Add random delay between iterations 
     print(f'counter:{i}\n')
-    delay = random.uniform(1, 5) 
-    # delay = random.uniform(5, 10) 
+    # delay = random.uniform(1, 5) 
+    delay = random.uniform(5, 10) 
     print(f"Sleeping for {delay:.2f} seconds")
     time.sleep(delay)  # Random sleep    
     
     # Move to the previous day
     current_date = prev_day
     
-    if i>20:
+    if i>2:
         break
     i+=1
 

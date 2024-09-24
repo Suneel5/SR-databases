@@ -135,8 +135,8 @@ def get_page_save_links(url,min_date,df):
 def format_date(date_obj):
     return date_obj.strftime('%m/%d/%Y')
 
-end_date = datetime.strptime('2021-12-30', '%Y-%m-%d')
-start_date = datetime.strptime('2014-01-01', '%Y-%m-%d')
+end_date = datetime.strptime('2024-9-9', '%Y-%m-%d')
+start_date = datetime.strptime('2011-1-1', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
@@ -146,7 +146,7 @@ while current_date >= start_date:
     # Convert the date to the required format (mm/dd/yyyy)
     formatted_date = format_date(current_date)
     # Move to the previous day
-    prev_day = current_date - timedelta(days=4)
+    prev_day = current_date - timedelta(days=2)
     next_formatted_date = format_date(prev_day)
     print(f'Min date: {next_formatted_date}      max date: {formatted_date}')
     # Construct the URL for the Google search
@@ -178,7 +178,7 @@ while current_date >= start_date:
     # Move to the previous day
     current_date = prev_day
     
-    if i>1:
+    if i>5:
         break
     i+=1
 

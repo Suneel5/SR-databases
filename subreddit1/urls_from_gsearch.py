@@ -130,7 +130,7 @@ def format_date(date_obj):
 
 
 end_date = datetime.strptime('2024-7-27', '%Y-%m-%d')
-start_date = datetime.strptime('2018-01-1', '%Y-%m-%d')
+start_date = datetime.strptime('2014-01-1', '%Y-%m-%d')
 
 # Iterate from start_date to end_date, one day at a time
 current_date = end_date
